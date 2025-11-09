@@ -45,14 +45,19 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Start server
-app.listen(configs.port, async () => {
-  console.log(`Example app listening on port ${configs.port}`);
-  
-  // Test database connection when app starts
-  // This ensures database errors are detected early instead of waiting for the first request
-  const isConnected = await testDatabaseConnection();
-  if (isConnected) {
-    console.log('✅ Prisma Client ready (database connected)');
-  }
-});
+// Export app for Vercel serverless functions
+export default app;
+
+// Start server locally (not on Vercel)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(configs.port, async () => {
+    console.log(`Example app listening on port ${configs.port}`);
+    
+    // Test database connection when app starts
+    // This ensures database errors are detected early instead of waiting for the first request
+    const isConnected = await testDatabaseConnection();
+    if (isConnected) {
+      console.log('✅ Prisma Client ready (database connected)');
+    }
+  });
+}
